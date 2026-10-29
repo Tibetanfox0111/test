@@ -1,27 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 集計結果ボタンの生成と配置
-    const resultBtn = document.createElement('button');
-    resultBtn.id = 'show-results-btn';
-    resultBtn.textContent = '訴状を見る';
+    const homeScreen = document.getElementById('home-screen');
+    const surveyContainer = document.getElementById('survey-container');
+    const startSurveyBtn = document.getElementById('start-survey-btn');
+    const resultBtn = document.getElementById('show-results-btn');
 
-    // ボタンのスタイル設定（画面左上に固定表示）
-    Object.assign(resultBtn.style, {
-        position: 'fixed',
-        top: '15px',
-        left: '15px',
-        padding: '8px 16px',
-        backgroundColor: '#2c3e50',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '0.9rem',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        zIndex: '1000',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+    startSurveyBtn.addEventListener('click', () => {
+        homeScreen.hidden = true;
+        surveyContainer.hidden = false;
+        document.body.classList.add('survey-mode');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    document.body.appendChild(resultBtn);
 
     // パスワード認証処理
     const passwordModal = document.getElementById('password-modal');
@@ -107,6 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
             pendingAnswers = null;
         };
 
+        const returnToHome = () => {
+            submissionCompleteModal.hidden = true;
+            surveyContainer.hidden = true;
+            homeScreen.hidden = false;
+            document.body.classList.remove('survey-mode');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
         const saveSubmission = () => {
             const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
             submissions.push({
@@ -123,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             requiredCheckboxGroups.flat().forEach((checkbox) => {
                 checkbox.dispatchEvent(new Event('change'));
             });
-            submissionCompleteModal.hidden = false;
+            returnToHome();
         };
 
         surveyForm.addEventListener('submit', (event) => {
@@ -154,10 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submissionCompleteModal.hidden = true;
         });
         document.getElementById('page-close').addEventListener('click', () => {
-            submissionCompleteModal.hidden = true;
-            document.querySelector('.survey-container').hidden = true;
-            resultBtn.hidden = true;
-            window.close();
+            returnToHome();
         });
     }
 });

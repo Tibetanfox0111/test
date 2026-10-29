@@ -7,7 +7,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="survey-container">
+    <main id="home-screen" class="home-screen">
+        <div class="home-paper">
+            <p class="home-eyebrow">学生相談窓口アプリ</p>
+            <h1>訴状箱</h1>
+            <p class="home-description">これは教員からの体罰や叱責で悩みを抱えている生徒の相談アプリです</p>
+            <button type="button" id="start-survey-btn" class="start-btn">投函する</button>
+            <button type="button" id="show-results-btn" class="home-results-btn">訴状結果を見る</button>
+        </div>
+    </main>
+    <div class="survey-container" id="survey-container" hidden>
         <h1>体罰や叱責に関する相談アプリ 訴状箱</h1>
         <form id="survey-form">
             <!-- 質問 1 -->
