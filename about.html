@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訴状箱 - 提出一覧</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .submission-count {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .submission-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+        }
+        .letter-card {
+            border: 1px solid #ad8f68;
+            background: rgba(255, 248, 229, 0.45);
+            padding: 12px;
+            cursor: pointer;
+            color: #493b2c;
+            box-shadow: 0 3px 7px rgba(63, 42, 22, 0.18);
+        }
+        .letter-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(63, 42, 22, 0.28);
+        }
+        .letter-card img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1.35;
+            object-fit: cover;
+        }
+        .letter-image-wrap {
+            position: relative;
+            display: block;
+        }
+        .letter-label {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            padding: 8px 4px;
+            background: rgba(0, 0, 0, 0.58);
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 25px 0;
+        }
+        .answer-modal[hidden] {
+            display: none;
+        }
+        .answer-modal {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background: rgba(49, 31, 16, 0.6);
+            z-index: 10;
+        }
+        .answer-dialog {
+            position: relative;
+            width: min(600px, 100%);
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            background: #e5d1ad;
+            border: 1px solid #876443;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .answer-dialog h2 {
+            margin-bottom: 18px;
+            color: #4b3825;
+        }
+        .answer-form-preview {
+            padding: 18px;
+            border: 1px solid rgba(95, 67, 38, 0.25);
+            background: rgba(255, 248, 229, 0.28);
+        }
+        .preview-question {
+            margin-bottom: 18px;
+        }
+        .preview-question:last-child {
+            margin-bottom: 0;
+        }
+        .preview-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+        .preview-input {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #ad8f68;
+            border-radius: 2px;
+            background: rgba(255, 248, 229, 0.55);
+            color: #493b2c;
+            font: inherit;
+        }
+        .preview-input:disabled {
+            opacity: 1;
+        }
+        textarea.preview-input {
+            min-height: 80px;
+            resize: none;
+        }
+        .preview-options label {
+            display: block;
+            margin-bottom: 7px;
+        }
+        .preview-options input {
+            margin-right: 8px;
+        }
+        .preview-other-label {
+            display: block;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+        .answer-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #ad8f68;
+        }
+        .answer-item strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .close-modal {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            border: 0;
+            background: transparent;
+            color: #493b2c;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+        .delete-submission-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 11px;
+            border: 0;
+            border-radius: 4px;
+            background-color: #9b3d34;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .delete-submission-btn:hover {
+            background-color: #7d2f29;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #765338;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .back-btn:hover {
+            background-color: #5e402b;
+        }
+        .password-change-notice {
+            position: fixed;
+            top: 58px;
+            right: 15px;
+            z-index: 5;
+            padding: 9px 14px;
+            border: 1px solid #6f8f63;
+            border-radius: 4px;
+            background: #edf7e9;
+            color: #35552d;
+            font-weight: bold;
+        }
+        .password-change-notice[hidden] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <button type="button" id="change-password-btn" class="change-password-btn">パスワード変更</button>
+    <p id="password-change-notice" class="password-change-notice" role="status" hidden>パスワードを変更しました</p>
+    <div class="survey-container">
+        <h1>訴状一覧</h1>
+
+        <p id="submission-count" class="submission-count"></p>
+        <div id="submission-grid" class="submission-grid"></div>
+
+        <a href="index.html" class="back-btn">入力画面へ戻る</a>
+    </div>
+    <div id="answer-modal" class="answer-modal" hidden>
+        <div class="answer-dialog" role="dialog" aria-modal="true" aria-labelledby="answer-title">
+            <button type="button" class="close-modal" aria-label="閉じる">&times;</button>
+            <h2 id="answer-title">提出内容</h2>
+            <div id="answer-list"></div>
+            <button type="button" id="delete-submission-btn" class="delete-submission-btn">削除</button>
+        </div>
+    </div>
+    <div id="action-confirm-modal" class="confirm-modal" hidden>
+        <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="action-confirm-title">
+            <h2 id="action-confirm-title">確認</h2>
+            <p id="action-confirm-message"></p>
+            <div class="confirm-dialog-actions">
+                <button type="button" id="action-confirm-cancel" class="confirm-cancel">いいえ</button>
+                <button type="button" id="action-confirm-submit" class="confirm-submit">はい</button>
+            </div>
+        </div>
+    </div>
+    <div id="change-password-modal" class="password-modal" hidden>
+        <form id="change-password-form" class="password-dialog" autocomplete="off" novalidate>
+            <button type="button" class="password-dialog-close" aria-label="閉じる">&times;</button>
+            <h2>パスワード変更</h2>
+            <label for="current-password">現在のパスワード</label>
+            <input type="text" id="current-password" name="current-access-code" autocomplete="off" inputmode="numeric" required>
+            <label for="new-password">新しいパスワード</label>
+            <input type="text" id="new-password" name="new-access-code" autocomplete="off" inputmode="numeric" required>
+            <label for="confirm-password">新しいパスワード（確認）</label>
+            <input type="text" id="confirm-password" name="confirm-access-code" autocomplete="off" inputmode="numeric" required>
+            <p id="change-password-message" class="password-message" role="alert"></p>
+            <div class="password-dialog-actions">
+                <button type="button" id="change-password-cancel" class="password-cancel">キャンセル</button>
+                <button type="submit" class="password-submit">保存</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        const labels = {
+            school_name: '学校名', location: '都道府県・市町村', grade: '学年',
+            class: '組', number: '出席番号', type: '内容', type_other: '内容（その他）',
+            detail: '具体的な行為', date: '時期', situation: '状況',
+            situation_other: '状況（その他）', teacher_name: '教員名', injury: '症状',
+            desired_punishment: '希望する教員の処分内容'
+        };
+        const previewQuestions = [
+            { key: 'school_name', label: '1. あなたの学校名を教えてください。', required: true },
+            { key: 'location', label: '2. あなたの学校がある都道府県と市町村を入力してください。', required: true },
+            { key: 'grade', label: '3. あなたの学年を教えてください。', required: true },
+            { key: 'class', label: '4. あなたの組を教えてください。', required: true },
+            { key: 'number', label: '5. あなたの出席番号を教えてください。', required: true },
+            {
+                key: 'type',
+                label: '6. された・されているのはどのようなことですか？',
+                required: true,
+                options: [
+                    ['physical', '肉体的体罰'], ['mental', '精神的体罰'],
+                    ['excessive', '過度な叱責'], ['other', 'その他']
+                ],
+                otherKey: 'type_other'
+            },
+            { key: 'detail', label: '7. 具体的にはどのような行為ですか？', required: true, multiline: true },
+            { key: 'date', label: '8. その行為をされたのはいつ頃ですか？', required: true },
+            {
+                key: 'situation',
+                label: '9. その行為をされたのはどのときですか？',
+                required: true,
+                options: [
+                    ['commute_to', '登校中'], ['class', '授業中'], ['recess', '休み時間中'],
+                    ['commute_from', '下校中'], ['club', '部活中'], ['other', 'その他']
+                ],
+                otherKey: 'situation_other'
+            },
+            { key: 'teacher_name', label: '10. その行為を行った教員の名前を教えてください。', required: true },
+            { key: 'injury', label: '11. その行為によって怪我をした場合、どのような症状を発症したか、具体的に教えてください。', multiline: true },
+            { key: 'desired_punishment', label: '12. その行為を行った教員の懲戒としてどんな内容を希望しますか？', multiline: true }
+        ];
+        let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+        const grid = document.getElementById('submission-grid');
+        const modal = document.getElementById('answer-modal');
+        const answerList = document.getElementById('answer-list');
+        const deleteButton = document.getElementById('delete-submission-btn');
+        const actionConfirmModal = document.getElementById('action-confirm-modal');
+        const actionConfirmMessage = document.getElementById('action-confirm-message');
+        const actionConfirmCancel = document.getElementById('action-confirm-cancel');
+        const actionConfirmSubmit = document.getElementById('action-confirm-submit');
+        let selectedIndex = null;
+        let pendingConfirmAction = null;
+
+        const displayValue = (value) => Array.isArray(value) ? value.join('、') : (value || '未回答');
+        const renderSubmissions = () => {
+            grid.replaceChildren();
+            document.getElementById('submission-count').textContent = `提出人数：${submissions.length}人`;
+
+            if (submissions.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = 'まだ提出された回答はありません。';
+                grid.appendChild(emptyMessage);
+                return;
+            }
+
+            submissions.forEach((submission, index) => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'letter-card';
+                card.setAttribute('aria-label', `訴状(${index + 1})を開く`);
+                card.innerHTML = `<span class="letter-image-wrap"><img src="letter.jpg" alt="訴状(${index + 1})"><span class="letter-label">訴状(${index + 1})</span></span>`;
+                card.addEventListener('click', () => {
+                    selectedIndex = index;
+                    answerList.replaceChildren();
+                    answerList.className = 'answer-form-preview';
+                    previewQuestions.forEach((question) => {
+                        const questionContainer = document.createElement('div');
+                        questionContainer.className = 'preview-question';
+                        const label = document.createElement('label');
+                        label.className = 'preview-label';
+                        label.textContent = question.label;
+                        if (question.required) {
+                            const requiredMark = document.createElement('span');
+                            requiredMark.className = 'required-mark';
+                            requiredMark.textContent = ' (必須)';
+                            label.appendChild(requiredMark);
+                        }
+                        questionContainer.appendChild(label);
+
+                        const value = submission.answers[question.key];
+                        if (question.options) {
+                            const options = document.createElement('div');
+                            options.className = 'preview-options';
+                            const selectedOptions = Array.isArray(value) ? value : [];
+                            question.options.forEach(([optionValue, optionLabel]) => {
+                                const option = document.createElement('label');
+                                const checkbox = document.createElement('input');
+                                checkbox.type = 'checkbox';
+                                checkbox.disabled = true;
+                                checkbox.checked = selectedOptions.includes(optionValue);
+                                option.appendChild(checkbox);
+                                option.append(optionLabel);
+                                options.appendChild(option);
+                            });
+                            questionContainer.appendChild(options);
+                            if (question.otherKey && submission.answers[question.otherKey]) {
+                                const otherLabel = document.createElement('span');
+                                otherLabel.className = 'preview-other-label';
+                                otherLabel.textContent = 'その他の回答';
+                                questionContainer.appendChild(otherLabel);
+                                const otherInput = document.createElement('input');
+                                otherInput.className = 'preview-input';
+                                otherInput.type = 'text';
+                                otherInput.disabled = true;
+                                otherInput.value = submission.answers[question.otherKey];
+                                questionContainer.appendChild(otherInput);
+                            }
+                        } else {
+                            const input = document.createElement(question.multiline ? 'textarea' : 'input');
+                            input.className = 'preview-input';
+                            input.disabled = true;
+                            input.value = displayValue(value);
+                            questionContainer.appendChild(input);
+                        }
+                        answerList.appendChild(questionContainer);
+                    });
+                    modal.hidden = false;
+                });
+                grid.appendChild(card);
+            });
+        };
+
+        const closeActionConfirm = () => {
+            actionConfirmModal.hidden = true;
+            pendingConfirmAction = null;
+        };
+        const askForConfirmation = (message, action) => {
+            actionConfirmMessage.textContent = message;
+            pendingConfirmAction = action;
+            actionConfirmModal.hidden = false;
+        };
+
+        deleteButton.addEventListener('click', () => {
+            if (selectedIndex === null) return;
+            askForConfirmation('この訴状を取り下げますか？', () => {
+                askForConfirmation('取り下げをすると、戻ることはありません。本当に削除しますか？', () => {
+                    submissions.splice(selectedIndex, 1);
+                    localStorage.setItem('submissions', JSON.stringify(submissions));
+                    selectedIndex = null;
+                    modal.hidden = true;
+                    renderSubmissions();
+                });
+            });
+        });
+
+        actionConfirmCancel.addEventListener('click', closeActionConfirm);
+        actionConfirmSubmit.addEventListener('click', () => {
+            const action = pendingConfirmAction;
+            closeActionConfirm();
+            action?.();
+        });
+        actionConfirmModal.addEventListener('click', (event) => {
+            if (event.target === actionConfirmModal) closeActionConfirm();
+        });
+
+        renderSubmissions();
+        const closeModal = () => { modal.hidden = true; };
+        document.querySelector('.close-modal').addEventListener('click', closeModal);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeModal();
+        });
+
+        const changePasswordModal = document.getElementById('change-password-modal');
+        const changePasswordForm = document.getElementById('change-password-form');
+        const changePasswordMessage = document.getElementById('change-password-message');
+        const passwordChangeNotice = document.getElementById('password-change-notice');
+        const closeChangePasswordModal = () => {
+            changePasswordModal.hidden = true;
+            changePasswordForm.reset();
+            changePasswordMessage.textContent = '';
+        };
+        document.getElementById('change-password-btn').addEventListener('click', () => {
+            changePasswordModal.hidden = false;
+            passwordChangeNotice.hidden = true;
+            document.getElementById('current-password').focus();
+        });
+        changePasswordModal.querySelector('.password-dialog-close').addEventListener('click', closeChangePasswordModal);
+        document.getElementById('change-password-cancel').addEventListener('click', closeChangePasswordModal);
+        changePasswordModal.addEventListener('click', (event) => {
+            if (event.target === changePasswordModal) closeChangePasswordModal();
+        });
+        changePasswordForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const savedPassword = localStorage.getItem('surveyPassword') || '1234';
+
+            if (currentPassword !== savedPassword) {
+                changePasswordMessage.textContent = '現在のパスワードが正しくありません。';
+                return;
+            }
+            if (!newPassword) {
+                changePasswordMessage.textContent = '新しいパスワードを入力してください。';
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                changePasswordMessage.textContent = '新しいパスワードが一致しません。';
+                return;
+            }
+
+            localStorage.setItem('surveyPassword', newPassword);
+            closeChangePasswordModal();
+            passwordChangeNotice.hidden = false;
+        });
+    </script>
+</body>
+</html>

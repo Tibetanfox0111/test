@@ -1,2 +1,140 @@
-<h1> test </h1>
-<div> ABC </div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生相談窓口アプリ・訴状箱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="survey-container">
+        <h1>体罰や叱責に関する相談アプリ 訴状箱</h1>
+        <form id="survey-form">
+            <!-- 質問 1 -->
+            <div class="question-group">
+                <label for="q1" class="question-label">1. あなたの学校名を教えてください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q1" name="school_name" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 2 -->
+            <div class="question-group">
+                <label for="q2" class="question-label">2. あなたの学校がある都道府県と市町村を入力してください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q2" name="location" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 3 -->
+            <div class="question-group">
+                <label for="q3" class="question-label">3. あなたの学年を教えてください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q3" name="grade" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 4 -->
+            <div class="question-group">
+                <label for="q4" class="question-label">4. あなたの組を教えてください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q4" name="class" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 5 -->
+            <div class="question-group">
+                <label for="q5" class="question-label">5. あなたの出席番号を教えてください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q5" name="number" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 6 -->
+            <div class="question-group">
+                <label class="question-label">6. された・されているのはどのようなことですか？（複数回答可） <span class="required-mark">(必須)</span></label>
+                <div class="options">
+                    <label><input type="checkbox" name="type" value="physical"> 肉体的体罰</label>
+                    <label><input type="checkbox" name="type" value="mental"> 精神的体罰</label>
+                    <label><input type="checkbox" name="type" value="excessive"> 過度な叱責</label>
+                    <label><input type="checkbox" name="type" value="other" id="q6-other-checkbox"> その他</label>
+                </div>
+                <!-- その他選択時のみ表示される入力スペース -->
+                <div id="q6-other-container" style="display: none; margin-top: 8px;">
+                    <input type="text" id="q6_other" name="type_other" placeholder="ここに回答">
+                </div>
+            </div>
+
+            <!-- 質問 7 -->
+            <div class="question-group">
+                <label for="q7" class="question-label">7. 具体的にはどのような行為ですか？ <span class="required-mark">(必須)</span></label>
+                <textarea id="q7" name="detail" rows="4" placeholder="ここに回答" required></textarea>
+            </div>
+
+            <!-- 質問 8 -->
+            <div class="question-group">
+                <label for="q8" class="question-label">8. その行為をされたのはいつ頃ですか？現在のなおされている場合はいつ頃からされていますか？ <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q8" name="date" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 9 -->
+            <div class="question-group">
+                <label class="question-label">9. その行為をされたのはどのときですか？（複数回答可） <span class="required-mark">(必須)</span></label>
+                <div class="options">
+                    <label><input type="checkbox" name="situation" value="commute_to"> 登校中</label>
+                    <label><input type="checkbox" name="situation" value="class"> 授業中</label>
+                    <label><input type="checkbox" name="situation" value="recess"> 休み時間中</label>
+                    <label><input type="checkbox" name="situation" value="commute_from"> 下校中</label>
+                    <label><input type="checkbox" name="situation" value="club"> 部活中</label>
+                    <label><input type="checkbox" name="situation" value="other" id="q9-other-checkbox"> その他</label>
+                </div>
+                <!-- その他選択時のみ表示される入力スペース -->
+                <div id="q9-other-container" style="display: none; margin-top: 8px;">
+                    <input type="text" id="q9_other" name="situation_other" placeholder="ここに回答">
+                </div>
+            </div>
+
+            <!-- 質問 10 -->
+            <div class="question-group">
+                <label for="q10" class="question-label">10. その行為を行った教員の名前を教えてください。 <span class="required-mark">(必須)</span></label>
+                <input type="text" id="q10" name="teacher_name" placeholder="ここに回答" required>
+            </div>
+
+            <!-- 質問 11 -->
+            <div class="question-group">
+                <label for="q11" class="question-label">11. その行為によって怪我をした場合、どのような症状を発症したか、具体的に教えてください。</label>
+                <textarea id="q11" name="injury" rows="4" placeholder="ここに回答"></textarea>
+            </div>
+
+            <!-- 質問 12 -->
+            <div class="question-group">
+                <label for="q12" class="question-label">12. その行為を行った教員の懲戒としてどんな内容を希望しますか？</label>
+                <textarea id="q12" name="desired_punishment" rows="4" placeholder="ここに回答"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">投函する</button>
+        </form>
+    </div>
+    <div id="password-modal" class="password-modal" hidden>
+        <form id="password-form" class="password-dialog" autocomplete="off" novalidate>
+            <button type="button" class="password-dialog-close" aria-label="閉じる">&times;</button>
+            <h2>訴状を見る</h2>
+            <label for="result-password">パスワード</label>
+            <input type="text" id="result-password" name="result-access-code" autocomplete="off" inputmode="numeric" required>
+            <p id="password-error" class="password-message" role="alert"></p>
+            <div class="password-dialog-actions">
+                <button type="button" id="password-cancel" class="password-cancel">キャンセル</button>
+                <button type="submit" class="password-submit">確認</button>
+            </div>
+        </form>
+    </div>
+    <div id="submit-confirm-modal" class="confirm-modal" hidden>
+        <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
+            <h2 id="submit-confirm-title">投函確認</h2>
+            <p>投函します。よろしいですか？</p>
+            <div class="confirm-dialog-actions">
+                <button type="button" id="submit-cancel" class="confirm-cancel">いいえ</button>
+                <button type="button" id="submit-confirm" class="confirm-submit">はい</button>
+            </div>
+        </div>
+    </div>
+    <div id="submission-complete-modal" class="confirm-modal" hidden>
+        <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="submission-complete-title">
+            <button type="button" class="password-dialog-close" id="submission-complete-close" aria-label="閉じる">&times;</button>
+            <h2 id="submission-complete-title">投函いたしました</h2>
+            <button type="button" id="page-close" class="confirm-submit">ページを閉じる</button>
+        </div>
+    </div>
+    <script src="indict.js"></script>
+</body>
+</html>

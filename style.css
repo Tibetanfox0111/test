@@ -1,0 +1,258 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f2faff;
+    color: #493b2c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.password-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(49, 31, 16, 0.6);
+    z-index: 20;
+}
+
+.password-modal[hidden] {
+    display: none;
+}
+
+.password-dialog {
+    position: relative;
+    display: grid;
+    gap: 8px;
+    width: min(420px, 100%);
+    padding: 28px;
+    background: #e5d1ad;
+    border: 1px solid #876443;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.password-dialog h2 {
+    margin-bottom: 12px;
+    color: #4b3825;
+}
+
+.password-dialog input {
+    width: 100%;
+    min-height: 48px;
+    margin: 0 0 8px;
+    padding: 12px;
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+}
+
+.password-dialog-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    border: 0;
+    background: transparent;
+    color: #493b2c;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.password-message {
+    min-height: 1.4em;
+    color: #9b3d34;
+}
+
+.password-dialog-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.password-dialog-actions button {
+    flex: 1;
+    padding: 11px;
+    border: 0;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.password-cancel {
+    background: #c9b99d;
+    color: #493b2c;
+}
+
+.password-submit {
+    background: #765338;
+    color: white;
+}
+
+.confirm-modal {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(49, 31, 16, 0.6);
+    z-index: 30;
+}
+
+.confirm-modal[hidden] {
+    display: none;
+}
+
+.confirm-dialog {
+    position: relative;
+    width: min(420px, 100%);
+    padding: 28px;
+    background: #e5d1ad;
+    border: 1px solid #876443;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.confirm-dialog h2 {
+    margin-bottom: 16px;
+    color: #4b3825;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.confirm-dialog-actions button {
+    flex: 1;
+    padding: 11px;
+    border: 0;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.confirm-cancel {
+    background: #c9b99d;
+    color: #493b2c;
+}
+
+.confirm-submit {
+    background: #765338;
+    color: white;
+}
+
+#page-close {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.change-password-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 5;
+    padding: 8px 16px;
+    border: 0;
+    border-radius: 4px;
+    background: #2c3e50;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.survey-container {
+    background-color: #e5d1ad;
+    background-image: linear-gradient(rgba(255, 248, 226, 0.22), rgba(120, 84, 45, 0.08));
+    border: 1px solid rgba(95, 67, 38, 0.35);
+    border-radius: 3px;
+    box-shadow: 0 5px 16px rgba(63, 42, 22, 0.25);
+    max-width: 650px;
+    width: 100%;
+    padding: 30px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    text-align: center;
+    color: #4b3825;
+    border-bottom: 2px solid #876443;
+    padding-bottom: 10px;
+}
+
+.question-group {
+    margin-bottom: 24px;
+}
+
+.question-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.required-mark {
+    color: #8b3f2f;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.options label {
+    display: block;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.options input[type="radio"],
+.options input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ad8f68;
+    border-radius: 2px;
+    background-color: rgba(255, 248, 229, 0.55);
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #876443;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.submit-btn {
+    width: 100%;
+    background-color: #765338;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #5e402b;
+}
