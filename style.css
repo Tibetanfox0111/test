@@ -133,6 +133,26 @@ body::before {
     background: rgba(118, 83, 56, 0.1);
 }
 
+.music-toggle-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1;
+    padding: 10px 16px;
+    border: 1px solid #765338;
+    border-radius: 4px;
+    background: rgba(229, 209, 173, 0.92);
+    box-shadow: 0 2px 6px rgba(49, 31, 16, 0.25);
+    color: #765338;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.music-toggle-btn:hover {
+    background: #e5d1ad;
+}
+
 [hidden] {
     display: none !important;
 }

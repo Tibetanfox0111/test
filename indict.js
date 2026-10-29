@@ -3,8 +3,74 @@ document.addEventListener('DOMContentLoaded', () => {
     const surveyContainer = document.getElementById('survey-container');
     const startSurveyBtn = document.getElementById('start-survey-btn');
     const resultBtn = document.getElementById('show-results-btn');
+    const backgroundMusic = document.getElementById('background-music');
+    const musicToggleBtn = document.getElementById('music-toggle-btn');
+    let musicEnabled = true;
+    let musicRetryTimer = null;
+    let musicStartTimer = null;
+    backgroundMusic.volume = 1;
+    backgroundMusic.loop = true;
+
+    const playHomeMusic = () => {
+        if (!musicEnabled || homeScreen.hidden || !backgroundMusic.paused) return Promise.resolve(true);
+        return backgroundMusic.play()
+            .then(() => {
+                window.clearInterval(musicRetryTimer);
+                musicRetryTimer = null;
+                return true;
+            })
+            .catch(() => false);
+    };
+
+    const scheduleHomeMusic = () => {
+        window.clearTimeout(musicStartTimer);
+        window.clearInterval(musicRetryTimer);
+        musicStartTimer = window.setTimeout(() => {
+            playHomeMusic();
+            musicRetryTimer = window.setInterval(() => {
+                playHomeMusic();
+            }, 500);
+            window.setTimeout(() => {
+                window.clearInterval(musicRetryTimer);
+                musicRetryTimer = null;
+            }, 10000);
+        }, 2000);
+    };
+
+    const updateMusicButton = () => {
+        musicToggleBtn.textContent = musicEnabled ? 'BGM OFF' : 'BGM ON';
+        musicToggleBtn.setAttribute('aria-pressed', String(!musicEnabled));
+    };
+
+    musicToggleBtn.addEventListener('click', () => {
+        musicEnabled = !musicEnabled;
+        if (musicEnabled) {
+            scheduleHomeMusic();
+        } else {
+            window.clearTimeout(musicStartTimer);
+            window.clearInterval(musicRetryTimer);
+            backgroundMusic.pause();
+        }
+        updateMusicButton();
+    });
+
+    ['pointerdown', 'keydown'].forEach((eventName) => {
+        document.addEventListener(eventName, () => {
+            if (!homeScreen.hidden) {
+                playHomeMusic();
+            }
+        }, { passive: true });
+    });
+
+    backgroundMusic.addEventListener('canplay', () => {
+        if (!homeScreen.hidden && musicEnabled) scheduleHomeMusic();
+    });
+    scheduleHomeMusic();
 
     startSurveyBtn.addEventListener('click', () => {
+        window.clearTimeout(musicStartTimer);
+        window.clearInterval(musicRetryTimer);
+        backgroundMusic.pause();
         homeScreen.hidden = true;
         surveyContainer.hidden = false;
         document.body.classList.add('survey-mode');
@@ -100,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             surveyContainer.hidden = true;
             homeScreen.hidden = false;
             document.body.classList.remove('survey-mode');
+            scheduleHomeMusic();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
