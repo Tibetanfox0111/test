@@ -1,11 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap");
+
+:root {
+    --paper-color: #e5d1ad;
+    --paper-shade: linear-gradient(rgba(255, 248, 226, 0.24), rgba(120, 84, 45, 0.1));
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    font-family: "Klee One", "Hannotate SC", "Yuji Syuku", "Comic Sans MS", cursive;
     background-color: #6f563e;
     background-image: linear-gradient(rgba(40, 25, 12, 0.18), rgba(40, 25, 12, 0.18)), url("board.jpg");
     background-position: center;
@@ -45,8 +56,8 @@ body::before {
     position: relative;
     width: min(620px, 100%);
     padding: clamp(42px, 8vw, 78px) clamp(28px, 8vw, 76px);
-    background-color: #e5d1ad;
-    background-image: linear-gradient(rgba(255, 248, 226, 0.24), rgba(120, 84, 45, 0.1));
+    background-color: var(--paper-color);
+    background-image: var(--paper-shade);
     border: 1px solid rgba(95, 67, 38, 0.4);
     box-shadow: 0 12px 28px rgba(24, 15, 8, 0.42), 0 2px 4px rgba(24, 15, 8, 0.25);
     transform: rotate(-1deg);
@@ -291,6 +302,32 @@ body::before {
     color: white;
 }
 
+.submit-loading {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin: 20px 0;
+}
+
+.loading-spinner {
+    width: 42px;
+    height: 42px;
+    border: 4px solid rgba(118, 83, 56, 0.25);
+    border-top-color: #765338;
+    border-radius: 50%;
+    animation: submit-spin 0.8s linear infinite;
+}
+
+@keyframes submit-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#submit-complete {
+    margin-top: 20px;
+}
+
 #page-close {
     width: 100%;
     margin-top: 8px;
@@ -312,8 +349,8 @@ body::before {
 }
 
 .survey-container {
-    background-color: #e5d1ad;
-    background-image: linear-gradient(rgba(255, 248, 226, 0.22), rgba(120, 84, 45, 0.08));
+    background-color: var(--paper-color);
+    background-image: var(--paper-shade);
     border: 1px solid rgba(95, 67, 38, 0.35);
     border-radius: 3px;
     box-shadow: 0 5px 16px rgba(63, 42, 22, 0.25);
@@ -321,6 +358,64 @@ body::before {
     width: 100%;
     margin: 20px auto;
     padding: 30px;
+}
+
+#survey-container {
+    max-width: 860px;
+    margin: 34px auto;
+    padding: clamp(36px, 5vw, 58px);
+    font-family: "Klee One", "Hannotate SC", "Yuji Syuku", "Comic Sans MS", cursive;
+}
+
+#survey-container input,
+#survey-container textarea,
+#survey-container button {
+    font-family: inherit;
+}
+
+#survey-container h1 {
+    font-size: clamp(1.7rem, 3.2vw, 2.2rem);
+    margin-bottom: 34px;
+    padding-bottom: 14px;
+}
+
+#survey-container .question-group {
+    margin-bottom: 32px;
+}
+
+#survey-container .question-label {
+    margin-bottom: 15px;
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    line-height: 1.7;
+}
+
+#survey-container .options label {
+    margin-bottom: 11px;
+    font-size: 1.08rem;
+}
+
+#survey-container .options input[type="radio"],
+#survey-container .options input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    vertical-align: -3px;
+}
+
+#survey-container input[type="text"],
+#survey-container textarea {
+    min-height: 52px;
+    padding: 13px 14px;
+    font-size: 1.08rem;
+}
+
+#survey-container textarea {
+    min-height: 130px;
+}
+
+#survey-container .submit-btn {
+    padding: 17px;
+    font-size: 1.15rem;
 }
 
 h1 {

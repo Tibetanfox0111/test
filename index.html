@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学生相談窓口アプリ・訴状箱</title>
+    <title>学生相談窓口アプリ・訴訟箱</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main id="home-screen" class="home-screen">
         <div class="home-paper">
             <p class="home-eyebrow">学生相談窓口アプリ</p>
-            <h1>訴状箱</h1>
+            <h1>訴訟箱</h1>
             <p class="home-description">これは教員からの体罰や叱責で悩みを抱えている生徒の相談アプリです</p>
             <button type="button" id="start-survey-btn" class="start-btn">投函する</button>
-            <button type="button" id="show-results-btn" class="home-results-btn">訴状結果を見る</button>
+            <button type="button" id="show-results-btn" class="home-results-btn">訴状を見る</button>
         </div>
     </main>
     <button type="button" id="music-toggle-btn" class="music-toggle-btn" aria-pressed="false">BGM OFF</button>
     <audio id="background-music" src="sonata.webm" autoplay loop preload="auto"></audio>
     <div class="survey-container" id="survey-container" hidden>
-        <h1>体罰や叱責に関する相談アプリ 訴状箱</h1>
+        <h1>体罰や叱責に関する相談アプリ 訴訟箱</h1>
         <form id="survey-form">
             <!-- 質問 1 -->
             <div class="question-group">
@@ -132,18 +132,20 @@
     <div id="submit-confirm-modal" class="confirm-modal" hidden>
         <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
             <h2 id="submit-confirm-title">投函確認</h2>
-            <p>投函します。よろしいですか？</p>
+            <p id="submit-confirm-message">投函します。よろしいですか？</p>
+            <div id="submit-loading" class="submit-loading" hidden aria-live="polite">
+                <span class="loading-spinner" aria-hidden="true"></span>
+                <span>投函しています…</span>
+            </div>
+            <p id="submit-error" class="password-message" role="alert"></p>
             <div class="confirm-dialog-actions">
                 <button type="button" id="submit-cancel" class="confirm-cancel">いいえ</button>
                 <button type="button" id="submit-confirm" class="confirm-submit">はい</button>
             </div>
-        </div>
-    </div>
-    <div id="submission-complete-modal" class="confirm-modal" hidden>
-        <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="submission-complete-title">
-            <button type="button" class="password-dialog-close" id="submission-complete-close" aria-label="閉じる">&times;</button>
-            <h2 id="submission-complete-title">投函いたしました</h2>
-            <button type="button" id="page-close" class="confirm-submit">ページを閉じる</button>
+            <div id="submit-complete" hidden>
+                <h2 id="submission-complete-title">投函いたしました</h2>
+                <button type="button" id="page-close" class="confirm-submit">ページを閉じる</button>
+            </div>
         </div>
     </div>
     <script src="indict.js"></script>

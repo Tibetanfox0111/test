@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let musicEnabled = true;
     let musicRetryTimer = null;
     let musicStartTimer = null;
+    let scrollAnimationFrame = null;
     backgroundMusic.volume = 1;
     backgroundMusic.loop = true;
 
-    const playHomeMusic = () => {
-        if (!musicEnabled || homeScreen.hidden || !backgroundMusic.paused) return Promise.resolve(true);
+    const playMusic = () => {
+        if (!musicEnabled || !backgroundMusic.paused) return Promise.resolve(true);
         return backgroundMusic.play()
             .then(() => {
                 window.clearInterval(musicRetryTimer);
@@ -22,13 +23,44 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => false);
     };
 
+    const retryMusic = () => {
+        if (musicEnabled) {
+            playMusic();
+        }
+    };
+
+    const smoothScrollToTop = () => {
+        if (scrollAnimationFrame !== null) {
+            window.cancelAnimationFrame(scrollAnimationFrame);
+        }
+
+        const startY = window.scrollY;
+        const duration = 900;
+        const startTime = performance.now();
+        const easeInOut = (progress) => progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        const animate = (currentTime) => {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            window.scrollTo({ top: startY * (1 - easeInOut(progress)), behavior: 'auto' });
+            if (progress < 1) {
+                scrollAnimationFrame = window.requestAnimationFrame(animate);
+            } else {
+                scrollAnimationFrame = null;
+            }
+        };
+
+        scrollAnimationFrame = window.requestAnimationFrame(animate);
+    };
+
     const scheduleHomeMusic = () => {
         window.clearTimeout(musicStartTimer);
         window.clearInterval(musicRetryTimer);
         musicStartTimer = window.setTimeout(() => {
-            playHomeMusic();
+            retryMusic();
             musicRetryTimer = window.setInterval(() => {
-                playHomeMusic();
+                retryMusic();
             }, 500);
             window.setTimeout(() => {
                 window.clearInterval(musicRetryTimer);
@@ -45,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     musicToggleBtn.addEventListener('click', () => {
         musicEnabled = !musicEnabled;
         if (musicEnabled) {
-            scheduleHomeMusic();
+            playMusic();
         } else {
             window.clearTimeout(musicStartTimer);
             window.clearInterval(musicRetryTimer);
@@ -56,25 +88,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ['pointerdown', 'keydown'].forEach((eventName) => {
         document.addEventListener(eventName, () => {
-            if (!homeScreen.hidden) {
-                playHomeMusic();
-            }
+            retryMusic();
         }, { passive: true });
     });
 
+    backgroundMusic.addEventListener('ended', retryMusic);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) retryMusic();
+    });
     backgroundMusic.addEventListener('canplay', () => {
-        if (!homeScreen.hidden && musicEnabled) scheduleHomeMusic();
+        if (musicEnabled) scheduleHomeMusic();
     });
     scheduleHomeMusic();
 
     startSurveyBtn.addEventListener('click', () => {
-        window.clearTimeout(musicStartTimer);
-        window.clearInterval(musicRetryTimer);
-        backgroundMusic.pause();
+        retryMusic();
         homeScreen.hidden = true;
         surveyContainer.hidden = false;
         document.body.classList.add('survey-mode');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        smoothScrollToTop();
     });
 
     // パスワード認証処理
@@ -94,9 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.querySelector('.password-dialog-close').addEventListener('click', closePasswordModal);
     document.getElementById('password-cancel').addEventListener('click', closePasswordModal);
-    passwordModal.addEventListener('click', (event) => {
-        if (event.target === passwordModal) closePasswordModal();
-    });
     passwordForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const savedPassword = localStorage.getItem('surveyPassword') || '1234';
@@ -153,40 +182,81 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitConfirmModal = document.getElementById('submit-confirm-modal');
         const submitCancel = document.getElementById('submit-cancel');
         const submitConfirm = document.getElementById('submit-confirm');
-        const submissionCompleteModal = document.getElementById('submission-complete-modal');
+        const submitError = document.getElementById('submit-error');
+        const submitConfirmTitle = document.getElementById('submit-confirm-title');
+        const submitConfirmMessage = document.getElementById('submit-confirm-message');
+        const submitLoading = document.getElementById('submit-loading');
+        const submitComplete = document.getElementById('submit-complete');
+        const pageClose = document.getElementById('page-close');
         let pendingAnswers = null;
 
         const closeSubmitConfirm = () => {
             submitConfirmModal.hidden = true;
+            submitConfirmTitle.textContent = '投函確認';
+            submitConfirmMessage.hidden = false;
+            submitLoading.hidden = true;
+            submitError.textContent = '';
+            submitCancel.hidden = false;
+            submitConfirm.hidden = false;
+            submitComplete.hidden = true;
             pendingAnswers = null;
         };
 
         const returnToHome = () => {
-            submissionCompleteModal.hidden = true;
+            closeSubmitConfirm();
             surveyContainer.hidden = true;
             homeScreen.hidden = false;
             document.body.classList.remove('survey-mode');
             scheduleHomeMusic();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            smoothScrollToTop();
         };
 
         const saveSubmission = () => {
-            const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-            submissions.push({
-                submittedAt: new Date().toISOString(),
-                answers: pendingAnswers
-            });
-            localStorage.setItem('submissions', JSON.stringify(submissions));
-            closeSubmitConfirm();
+            if (!pendingAnswers) return;
+
+            submitConfirmTitle.textContent = '投函中';
+            submitConfirmMessage.hidden = true;
+            submitLoading.hidden = false;
+            submitError.textContent = '';
+            submitCancel.hidden = true;
+            submitConfirm.hidden = true;
+
+            try {
+                const storedSubmissions = localStorage.getItem('submissions');
+                const submissions = storedSubmissions ? JSON.parse(storedSubmissions) : [];
+                if (!Array.isArray(submissions)) {
+                    throw new Error('保存済みの投函データが配列ではありません。');
+                }
+                submissions.push({
+                    submittedAt: new Date().toISOString(),
+                    answers: pendingAnswers
+                });
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+            } catch (error) {
+                console.error('投函データの保存に失敗しました。', error);
+                submitConfirmTitle.textContent = '投函確認';
+                submitConfirmMessage.hidden = false;
+                submitLoading.hidden = true;
+                submitError.textContent = '投函データの保存に失敗しました。もう一度お試しください。';
+                submitCancel.hidden = false;
+                submitConfirm.hidden = false;
+                return;
+            }
+
             surveyForm.reset();
             q6OtherContainer?.style.setProperty('display', 'none');
             q9OtherContainer?.style.setProperty('display', 'none');
             if (q6OtherInput) q6OtherInput.required = false;
             if (q9OtherInput) q9OtherInput.required = false;
-            requiredCheckboxGroups.flat().forEach((checkbox) => {
+            requiredCheckboxGroups.flatMap((checkboxes) => Array.from(checkboxes)).forEach((checkbox) => {
                 checkbox.dispatchEvent(new Event('change'));
             });
-            returnToHome();
+            window.setTimeout(() => {
+                submitConfirmTitle.hidden = true;
+                submitLoading.hidden = true;
+                submitComplete.hidden = false;
+                pageClose.focus();
+            }, 450);
         };
 
         surveyForm.addEventListener('submit', (event) => {
@@ -204,19 +274,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             pendingAnswers = answers;
+            submitError.textContent = '';
+            submitConfirmTitle.hidden = false;
             submitConfirmModal.hidden = false;
         });
 
         submitCancel.addEventListener('click', closeSubmitConfirm);
         submitConfirm.addEventListener('click', saveSubmission);
-        submitConfirmModal.addEventListener('click', (event) => {
-            if (event.target === submitConfirmModal) closeSubmitConfirm();
-        });
 
-        document.getElementById('submission-complete-close').addEventListener('click', () => {
-            submissionCompleteModal.hidden = true;
-        });
-        document.getElementById('page-close').addEventListener('click', () => {
+        pageClose.addEventListener('click', () => {
             returnToHome();
         });
     }
