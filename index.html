@@ -16,7 +16,11 @@
             <button type="button" id="show-results-btn" class="home-results-btn">訴状を見る</button>
         </div>
     </main>
-    <button type="button" id="music-toggle-btn" class="music-toggle-btn" aria-pressed="false">BGM OFF</button>
+    <div class="utility-controls">
+        <button type="button" id="translate-btn" class="translate-btn">TRANSLATE</button>
+        <select id="language-select" class="language-select" aria-label="翻訳言語" hidden></select>
+        <button type="button" id="music-toggle-btn" class="music-toggle-btn" aria-pressed="false">BGM OFF</button>
+    </div>
     <audio id="background-music" src="sonata.webm" autoplay loop preload="auto"></audio>
     <div class="survey-container" id="survey-container" hidden>
         <h1>体罰や叱責に関する相談アプリ 訴訟箱</h1>
@@ -35,20 +39,20 @@
 
             <!-- 質問 3 -->
             <div class="question-group">
-                <label for="q3" class="question-label">3. あなたの学年を教えてください。 <span class="required-mark">(必須)</span></label>
-                <input type="text" id="q3" name="grade" placeholder="ここに回答" required>
+                <label for="q3" class="question-label">3. あなたの学年を教えてください。 <span class="anonymous-note">(匿名希望の方は書かないでください)</span></label>
+                <input type="text" id="q3" name="grade" placeholder="ここに回答">
             </div>
 
             <!-- 質問 4 -->
             <div class="question-group">
-                <label for="q4" class="question-label">4. あなたの組を教えてください。 <span class="required-mark">(必須)</span></label>
-                <input type="text" id="q4" name="class" placeholder="ここに回答" required>
+                <label for="q4" class="question-label">4. あなたの組を教えてください。 <span class="anonymous-note">(匿名希望の方は書かないでください)</span></label>
+                <input type="text" id="q4" name="class" placeholder="ここに回答">
             </div>
 
             <!-- 質問 5 -->
             <div class="question-group">
-                <label for="q5" class="question-label">5. あなたの出席番号を教えてください。 <span class="required-mark">(必須)</span></label>
-                <input type="text" id="q5" name="number" placeholder="ここに回答" required>
+                <label for="q5" class="question-label">5. あなたの出席番号を教えてください。 <span class="anonymous-note">(匿名希望の方は書かないでください)</span></label>
+                <input type="text" id="q5" name="number" placeholder="ここに回答">
             </div>
 
             <!-- 質問 6 -->
@@ -116,6 +120,7 @@
             <button type="submit" class="submit-btn">投函する</button>
         </form>
     </div>
+    <button type="button" id="back-home-btn" class="back-home-btn">ホーム画面へ戻る</button>
     <div id="password-modal" class="password-modal" hidden>
         <form id="password-form" class="password-dialog" autocomplete="off" novalidate>
             <button type="button" class="password-dialog-close" aria-label="閉じる">&times;</button>
@@ -148,6 +153,7 @@
             </div>
         </div>
     </div>
+    <script src="translate.js"></script>
     <script src="indict.js"></script>
 </body>
 </html>

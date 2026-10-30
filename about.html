@@ -188,6 +188,10 @@
     </style>
 </head>
 <body>
+    <div class="utility-controls">
+        <button type="button" id="translate-btn" class="translate-btn">TRANSLATE</button>
+        <select id="language-select" class="language-select" aria-label="翻訳言語" hidden></select>
+    </div>
     <button type="button" id="change-password-btn" class="change-password-btn">パスワード変更</button>
     <p id="password-change-notice" class="password-change-notice" role="status" hidden>パスワードを変更しました</p>
     <div class="survey-container">
@@ -233,6 +237,7 @@
             </div>
         </form>
     </div>
+    <script src="translate.js"></script>
     <script>
         const labels = {
             school_name: '学校名', location: '都道府県・市町村', grade: '学年',
@@ -244,9 +249,9 @@
         const previewQuestions = [
             { key: 'school_name', label: '1. あなたの学校名を教えてください。', required: true },
             { key: 'location', label: '2. あなたの学校がある都道府県と市町村を入力してください。', required: true },
-            { key: 'grade', label: '3. あなたの学年を教えてください。', required: true },
-            { key: 'class', label: '4. あなたの組を教えてください。', required: true },
-            { key: 'number', label: '5. あなたの出席番号を教えてください。', required: true },
+            { key: 'grade', label: '3. あなたの学年を教えてください。(匿名希望の方は書かないでください)' },
+            { key: 'class', label: '4. あなたの組を教えてください。(匿名希望の方は書かないでください)' },
+            { key: 'number', label: '5. あなたの出席番号を教えてください。(匿名希望の方は書かないでください)' },
             {
                 key: 'type',
                 label: '6. された・されているのはどのようなことですか？',
@@ -363,6 +368,7 @@
                 });
                 grid.appendChild(card);
             });
+            window.dispatchEvent(new Event('languagechange'));
         };
 
         const closeActionConfirm = () => {
